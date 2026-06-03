@@ -3,6 +3,5 @@
 *.exe
 *.bin
 
-.env
 .idea/
 .vscode/
