@@ -1,0 +1,8 @@
+/cmd/**/*.exe
+/dist/
+*.exe
+*.bin
+
+.env
+.idea/
+.vscode/

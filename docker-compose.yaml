@@ -1,0 +1,73 @@
+services:
+  # db
+  postgres:
+    build:
+      context: .
+      dockerfile: dockerfile.postgres
+    container_name: pgcontainer
+    ports:
+      - "5433:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    env_file:
+      - .env
+
+  # temporal server
+  temporal:
+    image: temporalio/auto-setup:1.26.2
+    container_name: loan-temporal
+    ports:
+      - "7233:7233"
+    environment:
+      - DB=${TEMPORAL_DRIVER}
+      - POSTGRES_PWD=${POSTGRES_PASSWORD}
+      - POSTGRES_SEEDS=pgcontainer
+      - DEFAULT_NAMESPACE=default
+    env_file:
+      - .env
+    depends_on:
+      - postgres
+
+  # temporal ui
+  temporal-ui:
+    image: temporalio/ui:2.31.0
+    container_name: loan-temporal-ui
+    ports:
+      - "8080:8080"
+    environment:
+      - TEMPORAL_GRPC_ENDPOINT=${TEMPORAL_HOST}
+      - TEMPORAL_ADDRESS=${TEMPORAL_HOST}
+    env_file:
+      - .env
+    restart: on-failure
+    depends_on:
+      - temporal
+
+  # api
+  api:
+    build:
+      context: .
+      dockerfile: dockerfile.api
+    container_name: loan-api
+    ports:
+      - "8081:8081"
+    env_file:
+      - .env
+    restart: on-failure
+    depends_on:
+      - temporal
+
+  # worker
+  worker:
+    build:
+      context: .
+      dockerfile: dockerfile.worker
+    container_name: loan-worker
+    env_file:
+      - .env
+    restart: on-failure
+    depends_on:
+      - temporal
+
+volumes:
+  pgdata:
