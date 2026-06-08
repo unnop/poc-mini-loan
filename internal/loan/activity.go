@@ -20,8 +20,8 @@ func (a *LoanActivities) SaveToDatabase(ctx context.Context, req models.LoanRequ
 	query := `
 		INSERT INTO loans (merchant_id, shop_name, principal_amount, current_balance, status, updated_at)
 		VALUES ($1, $2, $3, $3, $4, NOW())
-		ON CONFLICT (merchant_id) 
-		DO UPDATE SET status = $4, updated_at = NOW();
+		ON CONFLICT (merchant_id)
+		DO UPDATE SET principal_amount = $3, status = $4, updated_at = NOW();
 	`
 	_, err := a.DB.ExecContext(ctx, query, req.MerchantID, req.ShopName, req.PrincipalAmount, status)
 	if err != nil {
@@ -41,13 +41,13 @@ func (a *LoanActivities) PreScreening(ctx context.Context, req models.LoanReques
 		return false, nil
 	}
 
-	time.Sleep(30 * time.Second)
+	time.Sleep(20 * time.Second)
 	log.Printf("[Pre-Screening] The shop %s pre-screen passed", req.ShopName)
 	return true, nil
 }
 
 func (a *LoanActivities) DisburseFunds(ctx context.Context, req models.LoanRequest) error {
-	time.Sleep(30 * time.Second)
+	time.Sleep(15 * time.Second)
 	log.Printf("💸 [Activity: DisburseFunds] -> Transfers loan %.2f฿ to account %s completed", req.PrincipalAmount, req.ShopName)
 	return nil
 }

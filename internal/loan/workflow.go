@@ -69,7 +69,7 @@ func MerchantLoanWorkflow(ctx workflow.Context, req models.LoanRequest) (string,
 	var round int
 	for remainingBalance > 0 {
 		logger.Info("[Workflow] Sleeping until next day cycle...")
-		_ = workflow.Sleep(ctx, 20*time.Second)
+		_ = workflow.Sleep(ctx, 15*time.Second)
 
 		if round >= 3 {
 			return "FAILED_BY_BUSINESS_RULE", fmt.Errorf("auto repayment limit exceeded 3 rounds, shifting to manual process")

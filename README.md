@@ -1,14 +1,14 @@
 ```mermaid
 graph TD
     Merchant[ร้านค้า] -->|1. ยื่นกู้ผ่าน API /apply| API[API Gateway]
-    Manager[Mananger] -->|4. กดอนุมัติ /approve| API
+    Manager[Mananger] -->|4. กดอนุมัติผ่าน API /approve| API
     
     subgraph Core System [ระบบแกนหลัก]
         API -->|2. Start Workflow| Temporal[Temporal Server]
         API -->|3. Save สัญญากู้| DB[(PostgreSQL)]
         API -->|4. ส่ง Signal บอก| Temporal
         
-        Temporal <-->|5. เช็กยอดรายวัน & ตัดยอดออโต้| Worker[Go Loan Worker]
+        Temporal <-->|5. เช็กยอดรายวัน & ตัดยอดออโต้| Worker[Loan Worker]
         Worker -->|อัปเดตยอดชำระ| DB
     end
 
